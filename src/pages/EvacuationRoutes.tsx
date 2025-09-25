@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { MapPin, Navigation, Flame, Info, Locate, Filter, Plus, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import mainFloor1 from "/assets/maps/Floor1.jpg";
+import mainFloor2 from "/assets/maps/Floor2.jpg";
+import mainFloor3 from "/assets/maps/Floor3.jpg";
+import mainFloor4 from "/assets/maps/Floor4.jpg";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -17,23 +21,19 @@ const EvacuationRoutes = () => {
   const [zoom, setZoom] = useState(1);
   const canvasRef = useRef<HTMLDivElement>(null);
   
-  // Filter options
-  const [filters, setFilters] = useState({
-    exits: true,
-    fireExtinguishers: true,
-    assemblyPoints: true,
-    fireDoors: true
-  });
 
   // Buildings with floors
   const buildings = [
-    { id: 'main', name: 'Main Building', floors: 5 },
-    { id: 'cs', name: 'Computer Science', floors: 3 },
-    { id: 'library', name: 'Library', floors: 2 },
-    { id: 'canteen', name: 'Canteen', floors: 1 },
-    { id: 'hostel', name: 'Hostel Block', floors: 6 }
+    { id: 'main', name: 'Main Building', floors: 4 }
   ];
-
+  const floorMaps: Record<string, string> = {
+  "main-1": mainFloor1,
+  "main-2": mainFloor2,
+  "main-3": mainFloor3,
+  "main-4": mainFloor4,
+  
+  // add the rest
+};
   // Map items for demonstration
   const mapItems = [
     { type: 'exit', x: 80, y: 20, building: 'main', floor: 1, label: 'Main Exit' },
@@ -57,13 +57,7 @@ const EvacuationRoutes = () => {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [userLocation, setUserLocation] = useState<{x: number, y: number} | null>(null);
 
-  const toggleFilter = (filterType: keyof typeof filters) => {
-    setFilters({
-      ...filters,
-      [filterType]: !filters[filterType]
-    });
-  };
-
+  
   const zoomIn = () => {
     if (zoom < 2) setZoom(zoom + 0.2);
   };
@@ -76,6 +70,7 @@ const EvacuationRoutes = () => {
     // In a real app, this would use geolocation or indoor positioning
     setUserLocation({ x: 45 + Math.random() * 10, y: 45 + Math.random() * 10 });
   };
+
 
   const getIconForMapItem = (type: string) => {
     switch (type) {
@@ -126,11 +121,11 @@ const EvacuationRoutes = () => {
     setSelectedItem(item);
   };
 
-  const filteredMapItems = mapItems.filter(item => 
-    item.building === activeBuilding && 
-    (item.floor === selectedFloor || item.floor === 0) && 
-    filters[item.type as keyof typeof filters]
-  );
+    const filteredMapItems = mapItems.filter(item => 
+  item.building === activeBuilding && 
+  (item.floor === selectedFloor || item.floor === 0)
+);
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -203,46 +198,7 @@ const EvacuationRoutes = () => {
                   </Button>
                 </div>
               </div>
-              
-              <div>
-                <h3 className="text-sm font-medium mb-2">Show/Hide</h3>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="w-full flex items-center justify-between">
-                      <span>Filters</span>
-                      <Filter className="h-4 w-4 ml-2" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56">
-                    <DropdownMenuLabel>Map Elements</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuCheckboxItem
-                      checked={filters.exits}
-                      onCheckedChange={() => toggleFilter('exits')}
-                    >
-                      Exits
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      checked={filters.fireExtinguishers}
-                      onCheckedChange={() => toggleFilter('fireExtinguishers')}
-                    >
-                      Fire Extinguishers
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      checked={filters.assemblyPoints}
-                      onCheckedChange={() => toggleFilter('assemblyPoints')}
-                    >
-                      Assembly Points
-                    </DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem
-                      checked={filters.fireDoors}
-                      onCheckedChange={() => toggleFilter('fireDoors')}
-                    >
-                      Fire Doors
-                    </DropdownMenuCheckboxItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+          
               
               <Button 
                 className="w-full flex items-center justify-center" 
@@ -309,91 +265,41 @@ const EvacuationRoutes = () => {
             </TabsList>
             
             <TabsContent value="map" className="mt-4">
-              <Card>
-                <CardContent className="p-6">
-                  <div 
-                    ref={canvasRef}
-                    className="relative w-full aspect-square border rounded-lg bg-gray-50 overflow-hidden"
-                    style={{ transform: `scale(${zoom})`, transformOrigin: 'center' }}
-                  >
-                    {/* Building floor layout - simplified for demo */}
-                    <div className="absolute inset-0 p-2">
-                      <div className="h-full border-2 border-gray-300 rounded-lg relative">
-                        {/* Simple floor layout */}
-                        <div className="absolute top-[20%] left-[20%] right-[20%] bottom-[20%] border border-gray-500 bg-white"></div>
-                        <div className="absolute top-[40%] left-[20%] w-[60%] h-[1px] bg-gray-400"></div>
-                        <div className="absolute top-[20%] left-[40%] w-[1px] h-[60%] bg-gray-400"></div>
-                        
-                        {/* Building Label */}
-                        <div className="absolute top-2 left-2 text-xs font-bold">
-                          {buildings.find(b => b.id === activeBuilding)?.name} - Floor {selectedFloor}
-                        </div>
-                      </div>
+  <Card>
+    <CardContent className="p-6">
+      <div 
+        ref={canvasRef}
+        className="relative w-full aspect-square border rounded-lg bg-gray-50 overflow-hidden"
+        style={{ transform: `scale(${zoom})`, transformOrigin: 'center' }}
+      >
+        {/* Floor map image */}
+        <img
+          src={floorMaps[`${activeBuilding}-${selectedFloor}`]}
+          alt={`Map for ${activeBuilding} floor ${selectedFloor}`}
+          className="w-full h-full object-contain"
+        />
+      </div>
+        {/* Legend */}
+      <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
+        {['exit', 'fireExtinguisher', 'assemblyPoint', 'fireDoor'].map((type) => (
+          <div 
+            key={type} 
+            className={`flex items-center p-2 rounded-md border ${getColorForMapItem(type)}`}
+          >
+            <div className="mr-2">
+              {getIconForMapItem(type)}
+            </div>
+            <span className="text-xs font-medium">
+              {getLabelForMapItem(type)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </CardContent>
+  </Card>
+</TabsContent>
 
-                      {/* Map items */}
-                      {filteredMapItems.map((item, idx) => (
-                        <button
-                          key={idx}
-                          className={`absolute p-1 rounded-full border-2 transition-transform hover:scale-110 cursor-pointer z-10 ${
-                            selectedItem?.label === item.label ? 'ring-2 ring-blue-500' : ''
-                          }`}
-                          style={{ 
-                            left: `${item.x}%`, 
-                            top: `${item.y}%`,
-                            transform: 'translate(-50%, -50%)'
-                          }}
-                          onClick={() => handleItemClick(item)}
-                        >
-                          {getIconForMapItem(item.type)}
-                        </button>
-                      ))}
 
-                      {/* User location */}
-                      {userLocation && (
-                        <div 
-                          className="absolute w-4 h-4 bg-blue-500 rounded-full border-2 border-white z-20 animate-pulse"
-                          style={{ 
-                            left: `${userLocation.x}%`, 
-                            top: `${userLocation.y}%`,
-                            transform: 'translate(-50%, -50%)'
-                          }}
-                        ></div>
-                      )}
-
-                      {/* Path from user to nearest exit - only shown if user location is set */}
-                      {userLocation && (
-                        <svg className="absolute inset-0 w-full h-full z-0">
-                          <path 
-                            d={`M ${userLocation.x} ${userLocation.y} L 50 50 L 80 20`} 
-                            stroke="#3B82F6"
-                            strokeWidth="3"
-                            strokeDasharray="5,5"
-                            fill="none"
-                            className="animate-pulse"
-                          />
-                        </svg>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
-                    {['exit', 'fireExtinguisher', 'assemblyPoint', 'fireDoor'].map((type) => (
-                      <div 
-                        key={type} 
-                        className={`flex items-center p-2 rounded-md border ${getColorForMapItem(type)}`}
-                      >
-                        <div className="mr-2">
-                          {getIconForMapItem(type)}
-                        </div>
-                        <span className="text-xs font-medium">
-                          {getLabelForMapItem(type)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
             
             <TabsContent value="steps" className="mt-4">
               <Card>

@@ -98,7 +98,7 @@ const Dashboard = () => {
       id: 'HR-2023-001',
       type: 'Electrical',
       location: 'Computer Lab 3',
-      reportedBy: 'John Doe',
+      reportedBy: 'Jay Shah',
       date: '2 hours ago',
       priority: 'High'
     },
@@ -106,7 +106,7 @@ const Dashboard = () => {
       id: 'HR-2023-002',
       type: 'Chemical',
       location: 'Chemistry Lab',
-      reportedBy: 'Jane Smith',
+      reportedBy: 'Aagam Bothara',
       date: '1 day ago',
       priority: 'Medium'
     },
@@ -114,7 +114,7 @@ const Dashboard = () => {
       id: 'HR-2023-003',
       type: 'Blocked Exit',
       location: 'Main Building Exit',
-      reportedBy: 'Alex Johnson',
+      reportedBy: 'Harsh Jain',
       date: '3 days ago',
       priority: 'High'
     }
